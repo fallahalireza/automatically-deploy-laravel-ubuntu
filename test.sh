@@ -7,7 +7,8 @@ echo "name db user: ";read DESIRED_USERNAME
 
 
 # Execute a query to check the existence of the user
-result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "SELECT COUNT(*) FROM mysql.user WHERE user = '$DESIRED_USERNAME'")
+result=$(echo "SELECT COUNT(*) FROM mysql.user WHERE user = '$DESIRED_USERNAME';" | docker-compose exec -T mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD "$DB_NAME")
+
 
 if [ "$result" -gt 0 ]; then
   echo "User '$DESIRED_USERNAME' exists in the database."
@@ -17,4 +18,5 @@ fi
 
 
 
+#result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "SELECT COUNT(*) FROM mysql.user WHERE user = '$DESIRED_USERNAME'")
 
