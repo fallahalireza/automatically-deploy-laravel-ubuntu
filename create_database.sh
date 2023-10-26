@@ -129,7 +129,7 @@ else
   display_info "User '$db_user' does not exist in the database."
   display_gray "Do you want to create a user and a database and give database access to the user? (yes/no): ";read add_database
   if [ "$add_database" == "yes" ]; then
-      add_database_exists_user "$db_user" "$MYSQL_ROOT_PASSWORD"
+      add_database_not_exists_user "$db_user" "$MYSQL_ROOT_PASSWORD"
   else
       bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/install.sh)
   fi
