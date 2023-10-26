@@ -68,10 +68,8 @@ check_user_existence() {
   result=$(echo "SELECT user FROM mysql.user WHERE user = '$DESIRED_USERNAME';" | docker-compose exec -T mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD | grep -c .)
 
   if [ "$result" -gt 0 ]; then
-    echo "User '$DESIRED_USERNAME' exists in the database."
     return 1
   else
-    echo "User '$DESIRED_USERNAME' does not exist in the database."
     return 0
   fi
 }
@@ -81,7 +79,7 @@ export $(cat .env_package | xargs)
 
 display_gray "name db user: ";read db_user
 
-if  check_database_existence "$db_user" "$MYSQL_ROOT_PASSWORD" ; then
+if check_user_existence "$db_user" "$MYSQL_ROOT_PASSWORD" ; then
   display_error "User '$db_user' exists in the database."
 else
   display_error "User '$db_user' does not exist in the database."
