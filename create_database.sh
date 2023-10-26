@@ -82,17 +82,23 @@ export $(cat .env_package | xargs)
 
 display_gray "name database: ";read db_database
 
-if check_database_existence "$db_database" "$MYSQL_ROOT_PASSWORD"; then
-  display_error "The database already exists. Please choose a different name."
-fi
 
-display_gray "name db user: ";read db_user
+db_user="your_username"
+while true; do
+    display_gray "name db user: ";read new_user
+    # بررسی وجود نام کاربری در دیتابیس
+    user_exists=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "SELECT user FROM mysql.user WHERE user='$new_user';" -N)
 
-if check_user_existence "$db_user" "$MYSQL_ROOT_PASSWORD"; then
-  display_success "The user exists."
-else
-  display_error "The user does not exist."
-fi
+    if [ -z "$user_exists" ]; then
+        # نام کاربری جدید منحصر به فرد است
+        db_user="$new_user"
+        break
+    else
+        echo "This username already exists. Please choose a different one."
+    fi
+done
+echo "Selected username: $db_user"
+
 
 
 db_password=$(generate_strong_password 16)
