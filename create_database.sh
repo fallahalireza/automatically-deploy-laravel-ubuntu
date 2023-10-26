@@ -48,13 +48,53 @@ generate_strong_password() {
     local password=$(tr -dc "$characters" < /dev/urandom | head -c"$length")
     echo "$password"
 }
+check_database_existence() {
+  local database_name="$1"
+  local MYSQL_ROOT_PASSWORD="$2"
+  local sql_query="SHOW DATABASES LIKE '$database_name';"
+  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
 
+  if [ "$result" = "$database_name" ]; then
+    echo "Database '$database_name' already exists."
+    return 0
+  else
+    echo "Database '$database_name' does not exist."
+    return 1
+  fi
+}
+check_user_existence() {
+  local username="$1"
+  local MYSQL_ROOT_PASSWORD="$2"
+  local sql_query="SHOW GRANTS FOR '$username'@'%';"
+  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
+
+  if [[ "$result" == *"GRANT USAGE ON *.* TO '$username'@'%'"* ]]; then
+    echo "User '$username' exists."
+    return 0
+  else
+    echo "User '$username' does not exist."
+    return 1
+  fi
+}
 
 cd /root/laradock || exit
 export $(cat .env_package | xargs)
 
 display_gray "name database: ";read db_database
+
+if check_database_existence "$db_database" "$MYSQL_ROOT_PASSWORD"; then
+  display_error "The database already exists. Please choose a different name."
+fi
+
 display_gray "name db user: ";read db_user
+
+if check_user_existence "$db_user" "$MYSQL_ROOT_PASSWORD"; then
+  display_success "The user exists."
+else
+  display_error "The user does not exist."
+fi
+
+
 db_password=$(generate_strong_password 16)
 
 display_warning "Store your database information in a safe place."
@@ -71,13 +111,6 @@ if [ "$save_info_db" == "yes" ]; then
   sql_command1="CREATE DATABASE IF NOT EXISTS $db_database COLLATE utf8mb4_general_ci;"
   sql_command2="CREATE USER '$db_user'@'%' IDENTIFIED WITH mysql_native_password BY '$db_password';GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO '$db_user'@'%';ALTER USER '$db_user'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;"
   sql_command3="GRANT ALL PRIVILEGES ON $db_database.* TO '$db_user'@'%'; ALTER USER '$db_user'@'%' ;"
-
-  display_info "2"
-  display_info "$sql_command1"
-  display_success "-------------------------------------------------"
-  display_info "$sql_command2"
-  display_success "-------------------------------------------------"
-  display_info "$sql_command3"
 
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command1" || display_error "sql_command1"
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command2" || display_error "sql_command2"
