@@ -77,7 +77,6 @@ add_database_not_exists_user(){
   local MYSQL_ROOT_PASSWORD="$2"
   display_gray "name database: ";read read_db_database
   local db_database="$db_user""_""$read_db_database"
-  display_info $db_database
   db_password=$(generate_strong_password 16)
 
   display_warning "Store your database information in a safe place."
@@ -112,6 +111,7 @@ add_database_exists_user(){
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command"
   display_success "The database was created and the user has full access to it (name database: $db_database)"
 }
+
 cd /root/laradock || exit
 export $(cat .env_package | xargs)
 
