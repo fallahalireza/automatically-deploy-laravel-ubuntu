@@ -70,8 +70,9 @@ if [ "$save_info_db" == "yes" ]; then
   cd /root/laradock
   sql_command1="CREATE DATABASE IF NOT EXISTS $db_database COLLATE utf8mb4_general_ci;"
   sql_command2="CREATE USER '$db_user'@'%' IDENTIFIED WITH mysql_native_password BY '$db_password';GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO '$db_user'@'%';ALTER USER '$db_user'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;"
-  sql_command3="GRANT ALL PRIVILEGES ON `$db_database`.* TO '$db_user'@'%'; ALTER USER '$db_user'@'%' ;"
+  sql_command3="GRANT ALL PRIVILEGES ON $db_database.* TO '$db_user'@'%'; ALTER USER '$db_user'@'%' ;"
 
+  display_info "2"
   display_info "$sql_command1"
   display_success "-------------------------------------------------"
   display_info "$sql_command2"
