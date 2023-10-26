@@ -73,8 +73,10 @@ if [ "$save_info_db" == "yes" ]; then
   sql_command3="GRANT ALL PRIVILEGES ON `$db_database`.* TO '$db_user'@'%'; ALTER USER '$db_user'@'%' ;"
 
   display_info "$sql_command1"
+  display_success "-------------------------------------------------"
   display_info "$sql_command2"
-  display_info "$sql_command1"
+  display_success "-------------------------------------------------"
+  display_info "$sql_command3"
 
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command1" || display_error "sql_command1"
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command2" || display_error "sql_command2"
