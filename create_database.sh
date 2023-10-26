@@ -48,20 +48,6 @@ generate_strong_password() {
     local password=$(tr -dc "$characters" < /dev/urandom | head -c"$length")
     echo "$password"
 }
-#check_database_existence() {
-#  local database_name="$1"
-#  local MYSQL_ROOT_PASSWORD="$2"
-#  local sql_query="SHOW DATABASES LIKE '$database_name';"
-#  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
-#
-#  if [ "$result" = "$database_name" ]; then
-#    echo "Database '$database_name' already exists."
-#    return 0
-#  else
-#    echo "Database '$database_name' does not exist."
-#    return 1
-#  fi
-#}
 check_user_existence() {
   local DESIRED_USERNAME="$1"
   local MYSQL_ROOT_PASSWORD="$2"
@@ -134,7 +120,3 @@ else
       bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/install.sh)
   fi
 fi
-
-
-
-#sql_command+="CREATE USER '$db_user'@'%' IDENTIFIED WITH mysql_native_password BY '$db_password';GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO '$db_user'@'%';ALTER USER '$db_user'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;"
