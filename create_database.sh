@@ -81,7 +81,7 @@ export $(cat .env_package | xargs)
 
 display_gray "name db user: ";read db_user
 
-if  check_database_existence "$db_user" ; then
+if  check_database_existence "$db_user" "$MYSQL_ROOT_PASSWORD" ; then
   display_error "User '$db_user' exists in the database."
 else
   display_error "User '$db_user' does not exist in the database."
