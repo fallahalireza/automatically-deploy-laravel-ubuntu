@@ -74,6 +74,7 @@ if [ "$save_info_db" == "yes" ]; then
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command"
 
   sql_command2="GRANT ALL PRIVILEGES ON `$db_database`.* TO '$db_user'@'%'; ALTER USER '$db_user'@'%' ;"
+  echo "$sql_command2"
   docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "$sql_command2"
 else
    bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/install.sh)
