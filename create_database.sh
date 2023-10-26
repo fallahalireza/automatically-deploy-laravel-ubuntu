@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -e
+set -e
 
 print_style () {
     local message="$1"
@@ -48,58 +48,40 @@ generate_strong_password() {
     local password=$(tr -dc "$characters" < /dev/urandom | head -c"$length")
     echo "$password"
 }
-check_database_existence() {
-  local database_name="$1"
-  local MYSQL_ROOT_PASSWORD="$2"
-  local sql_query="SHOW DATABASES LIKE '$database_name';"
-  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
-
-  if [ "$result" = "$database_name" ]; then
-    echo "Database '$database_name' already exists."
-    return 0
-  else
-    echo "Database '$database_name' does not exist."
-    return 1
-  fi
-}
-check_user_existence() {
-  local username="$1"
-  local MYSQL_ROOT_PASSWORD="$2"
-  local sql_query="SHOW GRANTS FOR '$username'@'%';"
-  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
-
-  if [[ "$result" == *"GRANT USAGE ON *.* TO '$username'@'%'"* ]]; then
-    echo "User '$username' exists."
-    return 0
-  else
-    echo "User '$username' does not exist."
-    return 1
-  fi
-}
+#check_database_existence() {
+#  local database_name="$1"
+#  local MYSQL_ROOT_PASSWORD="$2"
+#  local sql_query="SHOW DATABASES LIKE '$database_name';"
+#  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
+#
+#  if [ "$result" = "$database_name" ]; then
+#    echo "Database '$database_name' already exists."
+#    return 0
+#  else
+#    echo "Database '$database_name' does not exist."
+#    return 1
+#  fi
+#}
+#check_user_existence() {
+#  local username="$1"
+#  local MYSQL_ROOT_PASSWORD="$2"
+#  local sql_query="SHOW GRANTS FOR '$username'@'%';"
+#  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
+#
+#  if [[ "$result" == *"GRANT USAGE ON *.* TO '$username'@'%'"* ]]; then
+#    echo "User '$username' exists."
+#    return 0
+#  else
+#    echo "User '$username' does not exist."
+#    return 1
+#  fi
+#}
 
 cd /root/laradock || exit
 export $(cat .env_package | xargs)
 
 display_gray "name database: ";read db_database
-
-
-db_user="your_username"
-while true; do
-    display_gray "name db user: ";read new_user
-    # بررسی وجود نام کاربری در دیتابیس
-    user_exists=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "SELECT user FROM mysql.user WHERE user='$new_user';" -N)
-
-    if [ -z "$user_exists" ]; then
-        # نام کاربری جدید منحصر به فرد است
-        db_user="$new_user"
-        break
-    else
-        echo "This username already exists. Please choose a different one."
-    fi
-done
-echo "Selected username: $db_user"
-
-
+display_gray "name db user: ";read db_user
 
 db_password=$(generate_strong_password 16)
 
