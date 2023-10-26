@@ -6,8 +6,7 @@ export $(cat .env_package | xargs)
 echo "name db user: ";read DESIRED_USERNAME
 
 
-# Execute a query to check the existence of the user
-result=$(echo "SELECT user FROM mysql.user WHERE user = '$DESIRED_USERNAME';" | docker-compose exec -T mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD "$DB_NAME")
+result=$(echo "SELECT user FROM mysql.user WHERE user = '$DESIRED_USERNAME';" | docker-compose exec -T mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD "$DB_NAME" | grep -c .)
 
 
 
@@ -17,7 +16,7 @@ else
   echo "User '$DESIRED_USERNAME' does not exist in the database."
 fi
 
-echo "test 2"
+echo "test 3"
 
 #result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "SELECT COUNT(*) FROM mysql.user WHERE user = '$DESIRED_USERNAME'")
 
