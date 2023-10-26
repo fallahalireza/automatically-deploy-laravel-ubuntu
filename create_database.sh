@@ -77,6 +77,7 @@ add_database_not_exists_user(){
   local MYSQL_ROOT_PASSWORD="$2"
   display_gray "name database: ";read read_db_database
   local db_database="$db_user""_""$read_db_database"
+  display_info $db_database
   db_password=$(generate_strong_password 16)
 
   display_warning "Store your database information in a safe place."
