@@ -62,26 +62,32 @@ generate_strong_password() {
 #    return 1
 #  fi
 #}
-#check_user_existence() {
-#  local username="$1"
-#  local MYSQL_ROOT_PASSWORD="$2"
-#  local sql_query="SHOW GRANTS FOR '$username'@'%';"
-#  local result=$(docker-compose exec mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD -se "$sql_query")
-#
-#  if [[ "$result" == *"GRANT USAGE ON *.* TO '$username'@'%'"* ]]; then
-#    echo "User '$username' exists."
-#    return 0
-#  else
-#    echo "User '$username' does not exist."
-#    return 1
-#  fi
-#}
+check_user_existence() {
+  local DESIRED_USERNAME="$1"
+  local MYSQL_ROOT_PASSWORD="$2"
+  result=$(echo "SELECT user FROM mysql.user WHERE user = '$DESIRED_USERNAME';" | docker-compose exec -T mysql mysql -uroot -p$MYSQL_ROOT_PASSWORD | grep -c .)
+
+  if [ "$result" -gt 0 ]; then
+    echo "User '$DESIRED_USERNAME' exists in the database."
+    return 1
+  else
+    echo "User '$DESIRED_USERNAME' does not exist in the database."
+    return 0
+  fi
+}
 
 cd /root/laradock || exit
 export $(cat .env_package | xargs)
 
-display_gray "name database: ";read db_database
 display_gray "name db user: ";read db_user
+
+if  check_database_existence "$db_user" ; then
+  display_error "User '$db_user' exists in the database."
+else
+  display_error "User '$db_user' does not exist in the database."
+fi
+
+display_gray "name database: ";read db_database
 
 db_password=$(generate_strong_password 16)
 
