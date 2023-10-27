@@ -68,9 +68,25 @@ create_laravel_config_nginx() {
     sed -i "s/root \/var\/www\/laravel\/public;/root \/var\/www\/$2\/public;/" "$1.conf"
     display_success "The $1.conf file has been successfully created in /root/laradock/nginx/sites"
 }
+set_database() {
+    cd /root/sites/$1 || exit
+    echo "DB_HOST=mysql" >> .env
+    echo "DB_DATABASE=$2" >> .env
+    echo "DB_USERNAME=$3" >> .env
+    echo "DB_PASSWORD=$4" >> .env
+    display_success "Your site's database has been set up successfully"
+}
 
 display_gray "Please enter the desired domain for your site: "; read domain
 display_gray "Choose a name for your Laravel project: "; read  name_laravel
+
+print_style "(optional) " "warning"
+display_gray "Your database name: "; read  database_name
+print_style "(optional) " "warning"
+display_gray "Your database username: "; read  database_username
+print_style "(optional) " "warning"
+display_gray "Your database user password: "; read  database_password
+
 display_gray "Do you want to install the basic Laravel project or a customized project from a Git repository? (basic/git): "; read  type_project
 
 
@@ -88,6 +104,7 @@ if [ "$type_project" == "git" ] || [ "$type_project" == "basic" ]; then
         if [ "$type_project" == "basic" ]; then
           docker-compose exec workspace composer create-project laravel/laravel "$name_laravel"
           display_success "Your Laravel project has been successfully installed"
+          set_database "$name_laravel" "$database_name" "$database_username" "$database_password"
           create_laravel_config_nginx "$domain" "$name_laravel"
           set_permissions_and_restart_nginx "$name_laravel"
         fi
@@ -98,6 +115,7 @@ if [ "$type_project" == "git" ] || [ "$type_project" == "basic" ]; then
           git_clone "$link_git" "$name_laravel" "$token_git"
           docker-compose exec workspace bash -c "cd $name_laravel && composer install && cp .env.example .env && php artisan key:generate"
           display_success "composer install successfully"
+          set_database "$name_laravel" "$database_name" "$database_username" "$database_password"
           create_laravel_config_nginx "$domain" "$name_laravel"
           set_permissions_and_restart_nginx "$name_laravel"
         fi

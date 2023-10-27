@@ -20,18 +20,18 @@ print_style () {
 
     printf "$STARTCOLOR%b$ENDCOLOR" "$message"
 }
-
 display_error() {
     print_style "Error: $1" "danger" >&2
     echo
     exit 1
 }
-
 display_success() {
     print_style "$1" "success"
     echo
 }
-
+display_gray() {
+    print_style "$1" "gray"
+}
 display_info() {
     print_style "$1" "info"
     echo
@@ -59,9 +59,21 @@ cd /root/laradock || exit
 docker-compose up -d nginx mysql phpmyadmin workspace
 display_success "The containers are now running."
 
-display_info "The start of database construction"
-bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/create_database.sh)
 
-display_info "The start of site construction"
-bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/create_site.sh)
+display_gray "Do you want to create a new user and database? (yes/no): ";read start_database
+if [ "$start_database" == "yes" ]; then
+  display_info "The start of database construction"
+  bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/create_database.sh)
+fi
+
+display_gray "Do you want to create and set up a new site? (yes/no): ";read start_site
+if [ "$start_site" == "yes" ]; then
+  display_info "The start of site construction"
+  bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/create_site.sh)
+fi
+
+display_gray "Do you want to repeat the steps of building the database and site once again? (yes/no): ";read again_script
+if [ "$again_script" == "yes" ]; then
+  bash <(curl -Ls https://raw.githubusercontent.com/fallahalireza/automatically-deploy-laravel-ubuntu/main/install.sh)
+fi
 

@@ -49,7 +49,7 @@ generate_strong_password() {
     echo "$password"
 }
 
-my_ipv4=$(curl -s ifconfig.me)
+my_ipv4=$(ip addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 generated_password_default=$(generate_strong_password 16)
 generated_password_root=$(generate_strong_password 16)
 display_warning "Store your database information in a safe place."
