@@ -74,12 +74,12 @@ set_database() {
     sed -i "s/DB_DATABASE=laravel/DB_DATABASE=$2/" ".env"
     sed -i "s/DB_USERNAME=root/DB_USERNAME=$3/" ".env"
     sed -i "s/DB_PASSWORD=/DB_PASSWORD=$4/" ".env"
-
-#    echo "DB_HOST=mysql" >> .env
-#    echo "DB_DATABASE=$2" >> .env
-#    echo "DB_USERNAME=$3" >> .env
-#    echo "DB_PASSWORD=$4" >> .env
     display_success "Your site's database has been set up successfully"
+}
+run_migrate() {
+    cd /root/laradock || exit
+    docker-compose exec workspace bash -c "cd $1 && php artisan migrate"
+    display_success "Your database tables have been created successfully"
 }
 
 display_gray "Please enter the desired domain for your site: "; read domain
@@ -112,6 +112,10 @@ if [ "$type_project" == "git" ] || [ "$type_project" == "basic" ]; then
           set_database "$name_laravel" "$database_name" "$database_username" "$database_password"
           create_laravel_config_nginx "$domain" "$name_laravel"
           set_permissions_and_restart_nginx "$name_laravel"
+          display_gray "Do you want to create your own database tables? (yes/no):"; read ask_migrate
+          if [ "$ask_migrate" == "yes" ]; then
+            run_migrate "$name_laravel"
+          fi
         fi
 
         if [ "$type_project" == "git" ]; then
@@ -123,6 +127,10 @@ if [ "$type_project" == "git" ] || [ "$type_project" == "basic" ]; then
           set_database "$name_laravel" "$database_name" "$database_username" "$database_password"
           create_laravel_config_nginx "$domain" "$name_laravel"
           set_permissions_and_restart_nginx "$name_laravel"
+          display_gray "Do you want to create your own database tables? (yes/no):"; read ask_migrate
+          if [ "$ask_migrate" == "yes" ]; then
+            run_migrate "$name_laravel"
+          fi
         fi
     fi
 else
