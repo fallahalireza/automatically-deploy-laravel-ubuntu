@@ -70,10 +70,15 @@ create_laravel_config_nginx() {
 }
 set_database() {
     cd /root/sites/$1 || exit
-    echo "DB_HOST=mysql" >> .env
-    echo "DB_DATABASE=$2" >> .env
-    echo "DB_USERNAME=$3" >> .env
-    echo "DB_PASSWORD=$4" >> .env
+    sed -i "s/DB_HOST=127.0.0.1/DB_HOST=mysql/" ".env"
+    sed -i "s/DB_DATABASE=laravel/DB_DATABASE=$2/" ".env"
+    sed -i "s/DB_USERNAME=root/DB_USERNAME=$3/" ".env"
+    sed -i "s/DB_PASSWORD=/DB_PASSWORD=$4/" ".env"
+
+#    echo "DB_HOST=mysql" >> .env
+#    echo "DB_DATABASE=$2" >> .env
+#    echo "DB_USERNAME=$3" >> .env
+#    echo "DB_PASSWORD=$4" >> .env
     display_success "Your site's database has been set up successfully"
 }
 
