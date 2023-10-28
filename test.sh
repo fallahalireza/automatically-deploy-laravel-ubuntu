@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "test 2"
 echo "Enter email: ";read ssl_email
 echo "Enter the domain: ";read ssl_domain
 cd /root/laradock || exit
