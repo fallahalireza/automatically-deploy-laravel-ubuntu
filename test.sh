@@ -37,6 +37,7 @@ display_gray() {
     print_style "$1" "gray"
 }
 git_clone() {
+    cd /root/laradock || exit
     local link="$1"
     local name="$2"
     local token="$3"
@@ -66,9 +67,9 @@ run_migrate() {
     display_success "Your database tables have been created successfully"
 }
 
-echo "test 1"
+echo "test 2"
 
-
+cd /root/laradock || exit
 display_gray "Choose a name for your Laravel project: "; read  name_laravel
 display_gray "Please enter the URL of your Laravel project's Git repository (https://github.com/...): "; read link_git
 display_gray "Is your Git project private? If so, enter your access token. Otherwise, press Enter: "; read token_git
@@ -80,5 +81,4 @@ display_gray "Do you want to create your own database tables? (yes/no):"; read a
 if [ "$ask_migrate" == "yes" ]; then
   run_migrate "$name_laravel"
 fi
-
 
