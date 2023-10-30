@@ -36,39 +36,42 @@ display_info() {
 display_gray() {
     print_style "$1" "gray"
 }
-git_clone() {
-    cd /root/laradock || exit
-    local link="$1"
-    local name="$2"
-    local token="$3"
-    local full_link="$link"
-    if [ -n "$token" ]; then
-        full_link="${link:0:8}$token@${link:8}"
-    fi
-    if [ -d "/root/sites/$name/clone" ]; then
-        docker-compose exec workspace bash -c "rm -rf $name/clone"
-    fi
-    display_info "The full Git link is: $full_link"
-    docker-compose exec workspace git clone $full_link $name/clone || display_error "Failed to clone the Git repository. ($full_link)"
-    docker-compose exec workspace bash -c "cp $name/.env $name/clone/"
-    docker-compose exec workspace bash -c "find $name/ -maxdepth 1 ! -name "clone" -exec rm -rf {} \;"
-    docker-compose exec workspace bash -c "mv $name/clone/* $name/"
-    docker-compose exec workspace bash -c "rm -rf $name/clone"
-    display_success "Your custom project has been successfully copied to the server"
-}
 #git_clone() {
 #    cd /root/laradock || exit
 #    local link="$1"
-#    local name="$2""_clone"
+#    local name="$2"
 #    local token="$3"
 #    local full_link="$link"
 #    if [ -n "$token" ]; then
 #        full_link="${link:0:8}$token@${link:8}"
 #    fi
+#    if [ -d "/root/sites/$name/clone" ]; then
+#        docker-compose exec workspace bash -c "rm -rf $name/clone"
+#    fi
 #    display_info "The full Git link is: $full_link"
-#    docker-compose exec workspace git clone $full_link $name || display_error "Failed to clone the Git repository. ($full_link)"
+#    docker-compose exec workspace git clone $full_link $name/clone || display_error "Failed to clone the Git repository. ($full_link)"
+#    docker-compose exec workspace bash -c "cp $name/.env $name/clone/"
+#    docker-compose exec workspace bash -c "find $name/ -maxdepth 1 ! -name "clone" -exec rm -rf {} \;"
+#    docker-compose exec workspace bash -c "mv $name/clone/* $name/"
+#    docker-compose exec workspace bash -c "rm -rf $name/clone"
 #    display_success "Your custom project has been successfully copied to the server"
 #}
+git_clone() {
+    cd /root/laradock || exit
+    local link="$1"
+    local name="$2""_clone"
+    local token="$3"
+    local full_link="$link"
+    if [ -n "$token" ]; then
+        full_link="${link:0:8}$token@${link:8}"
+    fi
+    display_info "The full Git link is: $full_link"
+    docker-compose exec workspace git clone $full_link $name || display_error "Failed to clone the Git repository. ($full_link)"
+    display_success "Your custom project has been successfully copied to the server"
+    docker-compose exec workspace bash -c "cp $2/.env $name/"
+    docker-compose exec workspace bash -c "rm -rf $2"
+    docker-compose exec workspace bash -c "mv $name $2"
+}
 
 set_permissions_and_restart_nginx() {
     cd /root/laradock || exit
@@ -83,7 +86,7 @@ run_migrate() {
     display_success "Your database tables have been created successfully"
 }
 
-echo "test 5"
+echo "test 6"
 
 cd /root/laradock || exit
 display_gray "Choose a name for your Laravel project: "; read  name_laravel
